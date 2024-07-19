@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Agents to Empower Doctors</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/8.0.1/normalize.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-top: 10px;
+        }
+        select, input, textarea {
+            margin-top: 5px;
+            padding: 10px;
+            font-size: 16px;
+        }
+        button {
+            margin-top: 20px;
+            padding: 10px;
+            background: #007bff;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: left;
+            overflow: auto; /* Ensure content stays within the box */
+            max-width: 100%;
+            word-wrap: break-word; /* Wrap long words */
+        }
+        .hidden {
+            display: none;
+        }
+        .spinner {
+            display: none;
+            margin: 0 auto;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+        }
+        pre {
+            white-space: pre-wrap; /* Allow text to wrap properly */
+            word-break: break-word; /* Break long words to fit the container */
+            margin: 0; /* Remove default margin */
+            font-family: inherit; /* Match the parent font */
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>AI Agents to Empower Doctors</h1>
+        <form id="diagnosisForm">
+            <label for="gender">Select Gender</label>
+            <select id="gender" name="gender" required>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+            </select>
+            
+            <label for="age">Enter Age</label>
+            <input type="number" id="age" name="age" min="0" max="120" value="25" required>
+            
+            <label for="symptoms">Enter Symptoms</label>
+            <textarea id="symptoms" name="symptoms" rows="4" required>e.g., fever, cough, headache</textarea>
+            
+            <label for="medical_history">Enter Medical History</label>
+            <textarea id="medical_history" name="medical_history" rows="4" required>e.g., diabetes, hypertension</textarea>
+            
+            <button type="submit">Get Diagnosis and Treatment Plan</button>
+            <div class="spinner" id="spinner"></div>
+        </form>
+        
+        <div class="result hidden" id="result">
+            <h2>Diagnosis and Treatment Plan</h2>
+            <pre id="diagnosisResult"></pre>
+            <a href="" id="downloadLink" class="button">Download DOCX</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('diagnosisForm').addEventListener('submit', async function(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const formData = new FormData(form);
+            const spinner = document.getElementById('spinner');
+            spinner.style.display = 'block';
+            
+            const response = await fetch('/diagnose', {
+                method: 'POST',
+                body: formData
+            });
+
+            spinner.style.display = 'none';
+
+            if (response.ok) {
+                const result = await response.json();
+                document.getElementById('diagnosisResult').textContent = result.result;
+                document.getElementById('downloadLink').href = result.download_link;
+                document.getElementById('result').classList.remove('hidden');
+            } else {
+                alert('Failed to get diagnosis. Please try again.');
+            }
+        });
+    </script>
+</body>
+</html>
